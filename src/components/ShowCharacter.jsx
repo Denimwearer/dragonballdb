@@ -1,33 +1,38 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
 import axios from "axios";
 import Header from "./Header";
-const ShowCharacter = () => {
-  const [singleCharacter, setSingleCharacter] = useState({});
+import { useParams } from "react-router-dom";
 
-  let { id } = useParams();
-  const getData = () => {
-    axios.get(`https://dragonball-api.com/api/characters/${id}`).then((res) => {
-      setSingleCharacter(res.data);
-      console.log(res.data);
-      console.log(res.data.originPlanet);
-    });
-  };
+const ShowCharacter = ({ character, setCharacter }) => {
+  const [singleCharacter, setSingleCharacter] = useState({});
+  const { id } = useParams();
 
   useEffect(() => {
+    const getData = async () => {
+      try {
+        const response = await axios.get(`/characters/${id}`);
+        setSingleCharacter(response.data);
+        console.log(response.data);
+      } catch (error) {
+        console.error("Error fetching character data:", error);
+      }
+      console.log(id);
+    };
     getData();
-  }, []);
+  }, [id]);
+
   return (
     <div>
       <Header />
       <main>
         <div className="page">
           <div className="character-container">
-            <div className="character-card">
+            <div key={singleCharacter.id} className="character-card">
               <h3>Max Ki: {singleCharacter.maxKi}</h3>
               <h3>Race: {singleCharacter.race}</h3>
               <h3>Gender: {singleCharacter.gender}</h3>
-              <h3>Description: </h3> <p>{singleCharacter.description}</p>
+              <h3>Description:</h3>
+              <p>{singleCharacter.description}</p>
             </div>
             {singleCharacter.originPlanet && (
               <div className="character-card">
@@ -45,18 +50,12 @@ const ShowCharacter = () => {
         <div className="characterlist">
           <h2>Transformation</h2>
           <div className="character-container">
-            <div key={singleCharacter.id} className="character-card">
-              <img src={singleCharacter.image} alt={singleCharacter.name} />
-              <h2>{singleCharacter.name}</h2>
-              <h3>Ki: {singleCharacter.ki}</h3>
-            </div>
             {singleCharacter.transformations &&
-              singleCharacter.transformations.length > 0 &&
-              singleCharacter.transformations.map((c) => (
-                <div key={c.id} className="character-card">
-                  <img src={c.image} alt={c.name} />
-                  <h2>{c.name}</h2>
-                  <h3>Ki: {c.ki}</h3>
+              singleCharacter.transformations.map((t) => (
+                <div key={t.id} className="character-card">
+                  <img src={t.image} alt={t.name} />
+                  <h2>{t.name}</h2>
+                  <h3>Ki: {t.ki}</h3>
                 </div>
               ))}
           </div>

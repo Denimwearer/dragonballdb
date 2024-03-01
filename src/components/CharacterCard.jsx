@@ -15,12 +15,12 @@ const CharacterCard = ({ character, list, addCharacter, removeCharacter }) => {
 
   return (
     <div className="character-card">
-      <Link to={`/characters/${character.id}`}>
-        <div>
+      <div>
+        <Link to={`/characters/${character.name}/${character.id}`}>
           <img src={character.image} alt={character.name} />
-          <h2>{character.name}</h2>
-        </div>
-      </Link>
+        </Link>
+        <h2>{character.name}</h2>
+      </div>
       {button}
     </div>
   );

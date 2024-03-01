@@ -7,12 +7,10 @@ const Router = () => {
   const [character, setCharacter] = useState([]);
   const [list, setList] = useState([]);
   const getData = () => {
-    axios
-      .get("https://dragonball-api.com/api/characters?limit=58")
-      .then((res) => {
-        setCharacter(res.data.items);
-        console.log(res.data.items);
-      });
+    axios.get("/characters").then((res) => {
+      setCharacter(res.data);
+      console.log(res.data);
+    });
   };
 
   useEffect(() => {
@@ -42,7 +40,7 @@ const Router = () => {
       ),
     },
     {
-      path: "characters/:id",
+      path: "/characters/:name/:id",
       element: (
         <ShowCharacter
           character={character}
