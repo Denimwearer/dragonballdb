@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import Header from "./Header";
 import { useParams } from "react-router-dom";
+import BackButton from "./BackButton";
 
 const ShowCharacter = ({ character, setCharacter }) => {
   const [singleCharacter, setSingleCharacter] = useState({});
@@ -25,14 +26,19 @@ const ShowCharacter = ({ character, setCharacter }) => {
     <div>
       <Header />
       <main>
-        <div className="page">
-          <div className="character-container">
-            <div key={singleCharacter.id} className="character-card">
+        <div className="show-page">
+          <div className="back-button-container">
+            <BackButton />
+          </div>
+          <div className="show-character-container">
+            <div className="character-info" key={singleCharacter.id}>
               <h3>Max Ki: {singleCharacter.maxKi}</h3>
               <h3>Race: {singleCharacter.race}</h3>
               <h3>Gender: {singleCharacter.gender}</h3>
               <h3>Description:</h3>
-              <p>{singleCharacter.description}</p>
+              <p className="character-description">
+                {singleCharacter.description}
+              </p>
             </div>
             {singleCharacter.originPlanet && (
               <div className="character-card">

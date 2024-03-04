@@ -1,14 +1,15 @@
 import express from "express";
 import ViteExpress from "vite-express";
+import axios from "axios";
 import { config } from "dotenv";
 import { Character } from "./models/character.js";
 import { Transformation } from "./models/transformation.js";
 import { OriginPlanet } from "./models/originPlanet.js";
 import { sequelize } from "./util/db.js";
-import { CharacterTransformation } from "./models/characterTransformation.js";
 config();
+
 const { PORT } = process.env;
-import axios from "axios";
+
 import {
   getAllCharacters,
   showCharacter,
@@ -20,58 +21,53 @@ app.use(express.json());
 
 Character.hasMany(Transformation);
 Transformation.belongsTo(Character);
-// Character.belongsToMany(Transformation, { through: CharacterTransformation });
 Character.belongsTo(OriginPlanet);
 OriginPlanet.hasMany(Character);
-// CharacterTransformation.belongsTo(Character, { foreignKey: "characterId" });
-// CharacterTransformation.belongsTo(Transformation, {
-// foreignKey: "transformationId",
-// });
 
 const getData = async () => {
   try {
-    const listResponse = await axios.get(
+    const characters = await axios.get(
       "https://dragonball-api.com/api/characters?limit=58"
     );
 
-    const charactersData = listResponse.data.items;
+    const charactersData = characters.data.items;
 
     for (const characterData of charactersData) {
-      const detailResponse = await axios.get(
+      const singleCharacter = await axios.get(
         `https://dragonball-api.com/api/characters/${characterData.id}`
       );
 
-      const detailedCharacterData = detailResponse.data;
+      const singleCharacterData = singleCharacter.data;
 
       const [character, created] = await Character.upsert({
-        id: detailedCharacterData.id,
-        name: detailedCharacterData.name,
-        ki: detailedCharacterData.ki,
-        maxKi: detailedCharacterData.maxKi,
-        race: detailedCharacterData.race,
-        gender: detailedCharacterData.gender,
-        description: detailedCharacterData.description,
-        image: detailedCharacterData.image,
-        affiliation: detailedCharacterData.affiliation,
-        deletedAt: detailedCharacterData.deletedAt,
+        id: singleCharacterData.id,
+        name: singleCharacterData.name,
+        ki: singleCharacterData.ki,
+        maxKi: singleCharacterData.maxKi,
+        race: singleCharacterData.race,
+        gender: singleCharacterData.gender,
+        description: singleCharacterData.description,
+        image: singleCharacterData.image,
+        affiliation: singleCharacterData.affiliation,
+        deletedAt: singleCharacterData.deletedAt,
       });
 
       const [originPlanet, createdOriginPlanet] = await OriginPlanet.upsert({
-        id: detailedCharacterData.originPlanet.id,
-        name: detailedCharacterData.originPlanet.name,
-        isDestroyed: detailedCharacterData.originPlanet.isDestroyed,
-        description: detailedCharacterData.originPlanet.description,
-        image: detailedCharacterData.originPlanet.image,
-        deletedAt: detailedCharacterData.originPlanet.deletedAt,
+        id: singleCharacterData.originPlanet.id,
+        name: singleCharacterData.originPlanet.name,
+        isDestroyed: singleCharacterData.originPlanet.isDestroyed,
+        description: singleCharacterData.originPlanet.description,
+        image: singleCharacterData.originPlanet.image,
+        deletedAt: singleCharacterData.originPlanet.deletedAt,
       });
 
       await character.setOriginPlanet(originPlanet);
 
       if (
-        detailedCharacterData.transformations &&
-        detailedCharacterData.transformations.length > 0
+        singleCharacterData.transformations &&
+        singleCharacterData.transformations.length > 0
       ) {
-        for (const transformationData of detailedCharacterData.transformations) {
+        for (const transformationData of singleCharacterData.transformations) {
           const [transformation, createdTransformation] =
             await Transformation.upsert({
               id: transformationData.id,
