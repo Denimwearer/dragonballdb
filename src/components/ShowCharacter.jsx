@@ -11,13 +11,11 @@ const ShowCharacter = ({ character, setCharacter }) => {
   useEffect(() => {
     const getData = async () => {
       try {
-        const response = await axios.get(`/characters/${id}`);
-        setSingleCharacter(response.data);
-        console.log(response.data);
+        const res = await axios.get(`/characters/${id}`);
+        setSingleCharacter(res.data);
       } catch (error) {
         console.error("Error fetching character data:", error);
       }
-      console.log(id);
     };
     getData();
   }, [id]);

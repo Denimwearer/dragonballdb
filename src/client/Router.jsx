@@ -9,7 +9,6 @@ const Router = () => {
   const getData = () => {
     axios.get("/characters").then((res) => {
       setCharacter(res.data);
-      console.log(res.data);
     });
   };
 
